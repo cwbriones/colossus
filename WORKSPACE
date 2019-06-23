@@ -3,6 +3,8 @@ workspace(name = "colossus")
 # Versions
 PROMETHEUS_JAVA_VERSION = "0.4.0"
 
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
 # Imports basic Go rules for Bazel (e.g. go_binary)
 git_repository(
     name = "io_bazel_rules_go",
