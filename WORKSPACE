@@ -43,13 +43,6 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-# Imports Docker rules for Bazel (e.g. docker_image)
-git_repository(
-    name = "io_bazel_rules_docker",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
-    tag = "v0.16.0"
-)
-
 # Import gRPC for C++
 http_archive(
     name = "com_github_grpc_grpc",
@@ -115,30 +108,39 @@ maven_install(
     ],
 )
 
-# # Loads Docker for Java rules (e.g. java_image)
-# load(
-#     "@io_bazel_rules_docker//java:image.bzl",
-#     _java_image_repos = "repositories",
-# )
-#
-# _java_image_repos()
+# Imports Docker rules for Bazel (e.g. docker_image)
+git_repository(
+    name = "io_bazel_rules_docker",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+    tag = "v0.16.0"
+)
 
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+container_repositories()
 
-# # Loads Docker rules for Bazel
+# Loads Docker rules for Go
 load(
     "@io_bazel_rules_docker//go:image.bzl",
     _go_image_repos = "repositories",
 )
-
 _go_image_repos()
 
-# Loads C++ Docker image rules
-# load(
-#     "@io_bazel_rules_docker//cc:image.bzl",
-#     _cc_image_repos = "repositories",
-# )
+# Loads Docker for Java rules (e.g. java_image)
+load(
+    "@io_bazel_rules_docker//java:image.bzl",
+    _java_image_repos = "repositories",
+)
+_java_image_repos()
 
-# _cc_image_repos()
+# Loads C++ Docker image rules
+load(
+    "@io_bazel_rules_docker//cc:image.bzl",
+    _cc_image_repos = "repositories",
+)
+_cc_image_repos()
 
 # Gazelle-generated Go dependencies
 go_repository(
