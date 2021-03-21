@@ -57,30 +57,41 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 grpc_extra_deps()
 
-# Versions
-PROMETHEUS_JAVA_VERSION = "0.4.0"
-
 # Imports Docker rules for Bazel (e.g. docker_image)
 git_repository(
     name = "io_bazel_rules_docker",
     remote = "https://github.com/bazelbuild/rules_docker.git",
-    commit = "2a208c1b27533faed8afb723eb309ecc51828bb2",
-    shallow_since = "1615570347 -0700",
+    tag = "v0.16.0"
 )
 
 # Imports gRPC for Java rules (e.g. java_grpc_library)
 git_repository(
     name = "io_grpc_grpc_java",
+    commit = "e9065ab330aedd6b4d2dbc5623a66624dedbb596",
     remote = "https://github.com/grpc/grpc-java",
-    tag = "v1.32.3",
+    shallow_since = "1615587718 -0800",
 )
 
+load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
+grpc_java_repositories()
+
 # Import Maven rules for Gradle conversion
-git_repository(
-    name = "org_pubref_rules_maven",
-    remote = "https://github.com/pubref/rules_maven",
-    commit = "9c3b07a6d9b195a1192aea3cd78afd1f66c80710",
+RULES_JVM_EXTERNAL_TAG = "4.0"
+RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+# git_repository(
+#     name = "org_pubref_rules_maven",
+#     remote = "https://github.com/pubref/rules_maven",
+#     commit = "9c3b07a6d9b195a1192aea3cd78afd1f66c80710",
+# )
 
 # # Loads Maven rules
 # # load("@org_pubref_rules_maven//maven:rules.bzl", "maven_repositories", "maven_repository")
@@ -95,10 +106,6 @@ git_repository(
 #
 # _java_image_repos()
 #
-# # Loads gRPC for Java rules
-# load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
-#
-# grpc_java_repositories()
 
 # # Loads Docker rules for Bazel
 load(
@@ -116,21 +123,24 @@ _go_image_repos()
 
 # _cc_image_repos()
 
-# # gRPC for Java dependencies (shorthand)
-# bind(
-#     name = "grpc-core",
-#     actual = "@io_grpc_grpc_java//core",
-# )
-#
-# bind(
-#     name = "grpc-netty",
-#     actual = "@io_grpc_grpc_java//netty",
-# )
-#
-# bind(
-#     name = "grpc-stub",
-#     actual = "@io_grpc_grpc_java//stub",
-# )
+# gRPC for Java dependencies (shorthand)
+bind(
+    name = "grpc-core",
+    actual = "@io_grpc_grpc_java//core",
+)
+
+bind(
+    name = "grpc-netty",
+    actual = "@io_grpc_grpc_java//netty",
+)
+
+bind(
+    name = "grpc-stub",
+    actual = "@io_grpc_grpc_java//stub",
+)
+
+# Versions
+# PROMETHEUS_JAVA_VERSION = "0.4.0"
 #
 # maven_jar(
 #     name = "io_prometheus_simpleclient",
