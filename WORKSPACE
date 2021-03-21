@@ -43,6 +43,13 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
+# Imports Docker rules for Bazel (e.g. docker_image)
+git_repository(
+    name = "io_bazel_rules_docker",
+    remote = "https://github.com/bazelbuild/rules_docker.git",
+    tag = "v0.16.0"
+)
+
 # Import gRPC for C++
 http_archive(
     name = "com_github_grpc_grpc",
@@ -57,13 +64,6 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 grpc_extra_deps()
 
-# Imports Docker rules for Bazel (e.g. docker_image)
-git_repository(
-    name = "io_bazel_rules_docker",
-    remote = "https://github.com/bazelbuild/rules_docker.git",
-    tag = "v0.16.0"
-)
-
 # Imports gRPC for Java rules (e.g. java_grpc_library)
 git_repository(
     name = "io_grpc_grpc_java",
@@ -74,54 +74,6 @@ git_repository(
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
 grpc_java_repositories()
-
-# Import Maven rules for Gradle conversion
-RULES_JVM_EXTERNAL_TAG = "4.0"
-RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
-
-http_archive(
-    name = "rules_jvm_external",
-    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
-    sha256 = RULES_JVM_EXTERNAL_SHA,
-    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
-)
-load("@rules_jvm_external//:defs.bzl", "maven_install")
-
-# git_repository(
-#     name = "org_pubref_rules_maven",
-#     remote = "https://github.com/pubref/rules_maven",
-#     commit = "9c3b07a6d9b195a1192aea3cd78afd1f66c80710",
-# )
-
-# # Loads Maven rules
-# # load("@org_pubref_rules_maven//maven:rules.bzl", "maven_repositories", "maven_repository")
-# #
-# # maven_repositories()
-#
-# # Loads Docker for Java rules (e.g. java_image)
-# load(
-#     "@io_bazel_rules_docker//java:image.bzl",
-#     _java_image_repos = "repositories",
-# )
-#
-# _java_image_repos()
-#
-
-# # Loads Docker rules for Bazel
-load(
-    "@io_bazel_rules_docker//go:image.bzl",
-    _go_image_repos = "repositories",
-)
-
-_go_image_repos()
-
-# Loads C++ Docker image rules
-# load(
-#     "@io_bazel_rules_docker//cc:image.bzl",
-#     _cc_image_repos = "repositories",
-# )
-
-# _cc_image_repos()
 
 # gRPC for Java dependencies (shorthand)
 bind(
@@ -139,28 +91,54 @@ bind(
     actual = "@io_grpc_grpc_java//stub",
 )
 
-# Versions
-# PROMETHEUS_JAVA_VERSION = "0.4.0"
-#
-# maven_jar(
-#     name = "io_prometheus_simpleclient",
-#     artifact = "io.prometheus:simpleclient:" + PROMETHEUS_JAVA_VERSION,
+# Import Maven rules for Gradle conversion
+RULES_JVM_EXTERNAL_TAG = "4.0"
+RULES_JVM_EXTERNAL_SHA = "31701ad93dbfe544d597dbe62c9a1fdd76d81d8a9150c2bf1ecf928ecdf97169"
+
+http_archive(
+    name = "rules_jvm_external",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+)
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+maven_install(
+    artifacts = [
+        "io.prometheus:simpleclient:0.10.0",
+        "io.prometheus:simpleclient_common:0.10.0",
+        "io.prometheus:simpleclient_httpserver:0.10.0",
+        "me.dinowernli:java-grpc-prometheus:0.3.0",
+    ],
+    repositories = [
+        "https://repo.maven.apache.org/maven2",
+    ],
+)
+
+# # Loads Docker for Java rules (e.g. java_image)
+# load(
+#     "@io_bazel_rules_docker//java:image.bzl",
+#     _java_image_repos = "repositories",
 # )
 #
-# maven_jar(
-#     name = "io_prometheus_simpleclient_common",
-#     artifact = "io.prometheus:simpleclient_common:" + PROMETHEUS_JAVA_VERSION,
+# _java_image_repos()
+
+
+# # Loads Docker rules for Bazel
+load(
+    "@io_bazel_rules_docker//go:image.bzl",
+    _go_image_repos = "repositories",
+)
+
+_go_image_repos()
+
+# Loads C++ Docker image rules
+# load(
+#     "@io_bazel_rules_docker//cc:image.bzl",
+#     _cc_image_repos = "repositories",
 # )
-#
-# maven_jar(
-#     name = "io_prometheus_simpleclient_httpserver",
-#     artifact = "io.prometheus:simpleclient_httpserver:" + PROMETHEUS_JAVA_VERSION,
-# )
-#
-# maven_jar(
-#     name = "me_dinowernli_java_grpc_prometheus",
-#     artifact = "me.dinowernli:java-grpc-prometheus:0.3.0",
-# )
+
+# _cc_image_repos()
 
 # Gazelle-generated Go dependencies
 go_repository(

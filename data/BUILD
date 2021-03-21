@@ -8,10 +8,10 @@ java_library(
         "//external:grpc-stub",
         "//proto/data:data_java_grpc",
         "//proto/data:data_java_proto",
-        # "@io_prometheus_simpleclient//jar",
-        # "@io_prometheus_simpleclient_common//jar",
-        # "@io_prometheus_simpleclient_httpserver//jar",
-        # "@me_dinowernli_java_grpc_prometheus//jar",
+        "@maven//:io_prometheus_simpleclient",
+        "@maven//:io_prometheus_simpleclient_common",
+        "@maven//:io_prometheus_simpleclient_httpserver",
+        "@maven//:me_dinowernli_java_grpc_prometheus",
     ],
 )
 
