@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/lucperkins/colossus/auth",
     visibility = ["//visibility:public"],
     deps = [
-        "//proto/auth:go_default_library",
+        "//proto/auth",
         "@com_github_go_redis_redis//:go_default_library",
         "@com_github_grpc_ecosystem_go_grpc_prometheus//:go_default_library",
         "@com_github_prometheus_client_golang//prometheus:go_default_library",

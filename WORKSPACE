@@ -1,41 +1,78 @@
-workspace(name = "colossus")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-# Versions
-PROMETHEUS_JAVA_VERSION = "0.4.0"
+GRPC_SHA = "3e53dbe8213137d2c731ecd4d88ebd2948941d75"
 
 # Imports basic Go rules for Bazel (e.g. go_binary)
-git_repository(
+http_archive(
     name = "io_bazel_rules_go",
-    remote = "https://github.com/bazelbuild/rules_go.git",
-    commit = "e4d0254fb249a09fb01f052b23d3baddae1b70ec",
+    sha256 = "7c10271940c6bce577d51a075ae77728964db285dac0a46614a7934dc34303e6",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.26.0/rules_go-v0.26.0.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.26.0/rules_go-v0.26.0.tar.gz",
+    ],
 )
 
 # Imports the Gazelle tool for Go/Bazel
-git_repository(
+http_archive(
     name = "bazel_gazelle",
-    remote = "https://github.com/bazelbuild/bazel-gazelle",
-    commit = "644ec7202aa352b78d65bc66abc2c0616d76cc84",
+    sha256 = "62ca106be173579c0a167deb23358fdfe71ffa1e4cfdddf5582af26520f1c66f",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+    ],
 )
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.15.2")
+
+gazelle_dependencies()
+
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "985bb1ca491f0815daad825ef1857b684e0844dc68123626a08351686e8d30c9",
+    strip_prefix = "protobuf-3.15.6",
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v3.15.6.zip"],
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
+# Import gRPC for C++
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "89bab58f7bd36f2826b0bde92ea5668324642fe281d636dd18025354586cb764",
+    urls = [
+        "https://github.com/grpc/grpc/archive/3e53dbe8213137d2c731ecd4d88ebd2948941d75.tar.gz",
+    ],
+    strip_prefix = "grpc-3e53dbe8213137d2c731ecd4d88ebd2948941d75",
+)
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+grpc_deps()
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+grpc_extra_deps()
+
+# Versions
+PROMETHEUS_JAVA_VERSION = "0.4.0"
 
 # Imports Docker rules for Bazel (e.g. docker_image)
 git_repository(
     name = "io_bazel_rules_docker",
     remote = "https://github.com/bazelbuild/rules_docker.git",
-    tag = "v0.4.0",
+    commit = "2a208c1b27533faed8afb723eb309ecc51828bb2",
+    shallow_since = "1615570347 -0700",
 )
 
 # Imports gRPC for Java rules (e.g. java_grpc_library)
 git_repository(
     name = "io_grpc_grpc_java",
     remote = "https://github.com/grpc/grpc-java",
-    tag = "v1.12.0",
-)
-
-# Import gRPC for C++
-git_repository(
-    name = "com_github_grpc_grpc",
-    remote = "https://github.com/grpc/grpc.git",
-    commit = "17f682d8274ef0b7d1376eeee5e94839a0750e0e",
+    tag = "v1.32.3",
 )
 
 # Import Maven rules for Gradle conversion
@@ -45,34 +82,25 @@ git_repository(
     commit = "9c3b07a6d9b195a1192aea3cd78afd1f66c80710",
 )
 
-# Loads Maven rules
-load("@org_pubref_rules_maven//maven:rules.bzl", "maven_repositories", "maven_repository")
+# # Loads Maven rules
+# # load("@org_pubref_rules_maven//maven:rules.bzl", "maven_repositories", "maven_repository")
+# #
+# # maven_repositories()
+#
+# # Loads Docker for Java rules (e.g. java_image)
+# load(
+#     "@io_bazel_rules_docker//java:image.bzl",
+#     _java_image_repos = "repositories",
+# )
+#
+# _java_image_repos()
+#
+# # Loads gRPC for Java rules
+# load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
+#
+# grpc_java_repositories()
 
-maven_repositories()
-
-# Loads Docker for Java rules (e.g. java_image)
-load(
-    "@io_bazel_rules_docker//java:image.bzl",
-    _java_image_repos = "repositories",
-)
-
-_java_image_repos()
-
-# Loads gRPC for Java rules
-load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
-
-grpc_java_repositories()
-
-# Loads Go rules for Bazel
-load("@io_bazel_rules_go//go:def.bzl", "go_rules_dependencies", "go_register_toolchains")
-
-go_rules_dependencies()
-
-go_register_toolchains(
-    go_version = "1.10.1",
-)
-
-# Loads Docker rules for Bazel
+# # Loads Docker rules for Bazel
 load(
     "@io_bazel_rules_docker//go:image.bzl",
     _go_image_repos = "repositories",
@@ -80,59 +108,49 @@ load(
 
 _go_image_repos()
 
-# Loads C++ gRPC rules for Bazel
-load("@com_github_grpc_grpc//:bazel/grpc_deps.bzl", "grpc_deps")
-
-grpc_deps()
-
 # Loads C++ Docker image rules
-load(
-    "@io_bazel_rules_docker//cc:image.bzl",
-    _cc_image_repos = "repositories",
-)
+# load(
+#     "@io_bazel_rules_docker//cc:image.bzl",
+#     _cc_image_repos = "repositories",
+# )
 
-_cc_image_repos()
+# _cc_image_repos()
 
-# Loads Gazelle tool
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
-
-gazelle_dependencies()
-
-# gRPC for Java dependencies (shorthand)
-bind(
-    name = "grpc-core",
-    actual = "@io_grpc_grpc_java//core",
-)
-
-bind(
-    name = "grpc-netty",
-    actual = "@io_grpc_grpc_java//netty",
-)
-
-bind(
-    name = "grpc-stub",
-    actual = "@io_grpc_grpc_java//stub",
-)
-
-maven_jar(
-    name = "io_prometheus_simpleclient",
-    artifact = "io.prometheus:simpleclient:" + PROMETHEUS_JAVA_VERSION,
-)
-
-maven_jar(
-    name = "io_prometheus_simpleclient_common",
-    artifact = "io.prometheus:simpleclient_common:" + PROMETHEUS_JAVA_VERSION,
-)
-
-maven_jar(
-    name = "io_prometheus_simpleclient_httpserver",
-    artifact = "io.prometheus:simpleclient_httpserver:" + PROMETHEUS_JAVA_VERSION,
-)
-
-maven_jar(
-    name = "me_dinowernli_java_grpc_prometheus",
-    artifact = "me.dinowernli:java-grpc-prometheus:0.3.0",
-)
+# # gRPC for Java dependencies (shorthand)
+# bind(
+#     name = "grpc-core",
+#     actual = "@io_grpc_grpc_java//core",
+# )
+#
+# bind(
+#     name = "grpc-netty",
+#     actual = "@io_grpc_grpc_java//netty",
+# )
+#
+# bind(
+#     name = "grpc-stub",
+#     actual = "@io_grpc_grpc_java//stub",
+# )
+#
+# maven_jar(
+#     name = "io_prometheus_simpleclient",
+#     artifact = "io.prometheus:simpleclient:" + PROMETHEUS_JAVA_VERSION,
+# )
+#
+# maven_jar(
+#     name = "io_prometheus_simpleclient_common",
+#     artifact = "io.prometheus:simpleclient_common:" + PROMETHEUS_JAVA_VERSION,
+# )
+#
+# maven_jar(
+#     name = "io_prometheus_simpleclient_httpserver",
+#     artifact = "io.prometheus:simpleclient_httpserver:" + PROMETHEUS_JAVA_VERSION,
+# )
+#
+# maven_jar(
+#     name = "me_dinowernli_java_grpc_prometheus",
+#     artifact = "me.dinowernli:java-grpc-prometheus:0.3.0",
+# )
 
 # Gazelle-generated Go dependencies
 go_repository(
@@ -268,9 +286,9 @@ go_repository(
 )
 
 go_repository(
-    name = "org_golang_google_grpc",
-    commit = "d11072e7ca9811b1100b80ca0269ac831f06d024",
-    importpath = "google.golang.org/grpc",
+  name = "org_golang_google_grpc",
+  importpath = "google.golang.org/grpc",
+  tag = "v1.36.0"
 )
 
 go_repository(
