@@ -343,6 +343,6 @@ go_repository(
 
 go_repository(
     name = "com_github_caarlos0_env",
-    commit = "1cddc31c48c56ecd700d873edb9fd5b6f5df922a",
+    commit = "e244b8ab4ce741f29f37ac56f4ddd67acce3fb73",
     importpath = "github.com/caarlos0/env",
 )

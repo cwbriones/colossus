@@ -26,16 +26,22 @@ docker-registry:
 	docker run -d -p 5000:5000 --restart=always --name registry registry:2
 
 minikube-start:
-	minikube start --memory 5120 --cpus 4 --insecure-registry localhost:5000
+	minikube start --cpus 2 --insecure-registry localhost:5000
 
 minikube-setup:
 	minikube addons enable ingress
 
-docker-local-push: go-setup
+docker-local-load:
 	$(BAZEL) run //:colossus-web -- --norun
 	$(BAZEL) run //:colossus-auth -- --norun
 	$(BAZEL) run //:colossus-data -- --norun
 	$(BAZEL) run //:colossus-userinfo -- --norun
+
+docker-local-push:
+	$(BAZEL) run //:web-push
+	$(BAZEL) run //:auth-push
+	$(BAZEL) run //:data-push
+	$(BAZEL) run //:userinfo-push
 
 k8s-redis-deploy:
 	$(KCTL) apply -f k8s/redis.yaml

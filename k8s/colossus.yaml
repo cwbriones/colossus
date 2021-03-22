@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: colossus-data-deployment
@@ -34,7 +34,7 @@ spec:
     port: 1111
     targetPort: 1111
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: colossus-auth-deployment
@@ -70,7 +70,7 @@ spec:
       port: 8888
       targetPort: 8888
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: colossus-userinfo-deployment
@@ -106,7 +106,7 @@ spec:
       port: 7777
       targetPort: 7777
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: colossus-web-deployment
@@ -127,18 +127,18 @@ spec:
           image: bazel:colossus-web
           imagePullPolicy: Never
           ports:
-            - containerPort: 3000
+          - containerPort: 3000
           env:
           - name: AUTH_SERVICE_PORT
-            value: 8888
+            value: '8888'
           - name: AUTH_SERVICE_HOST
             value: colossus-auth-svc
           - name: DATA_SERVICE_PORT
-            value: 1111
+            value: '1111'
           - name: DATA_SERVICE_HOST
             value: colossus-data-svc
           - name: USERINFO_SERVICE_PORT
-            value: 7777
+            value: '7777'
           - name: USERINFO_SERVICE_HOST
             value: colossus-userinfo-svc
 ---
@@ -155,26 +155,33 @@ spec:
       port: 3000
       targetPort: 3000
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: colossus-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  backend:
-    serviceName: colossus-web-svc
-    servicePort: 3000
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: busybox
-spec:
-  containers:
-  - name: busybox
-    image: busybox
-    args:
-    - sh
-    - -c
-    - tail -f /dev/null
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: colossus-web-svc
+            port:
+              number: 3000
+# ---
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: busybox
+# spec:
+#   containers:
+#   - name: busybox
+#     image: busybox
+#     args:
+#     - sh
+#     - -c
+#     - tail -f /dev/null
