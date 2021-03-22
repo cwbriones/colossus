@@ -6,9 +6,9 @@ go_library(
     importpath = "github.com/lucperkins/colossus/web",
     visibility = ["//visibility:private"],
     deps = [
-        "//proto/auth",
+        "//proto/auth:go_default_library",
         "//proto/data:go_default_library",
-        "//proto/userinfo:go_default_library",
+        "//proto/userinfo:userinfo_go_grpc",
         "@com_github_caarlos0_env//:go_default_library",
         "@com_github_go_chi_chi//:go_default_library",
         "@com_github_go_chi_chi//middleware:go_default_library",

@@ -11,14 +11,14 @@ proto_library(
 go_proto_library(
     name = "auth_go_proto",
     compilers = ["@io_bazel_rules_go//proto:go_grpc"],
-    importpath = "github.com/lucperkins/colossus/proto/auth",
+    importpath = "github.com/cwbriones/colossus/proto/auth",
     proto = ":auth_proto",
     visibility = ["//visibility:public"],
 )
 
 go_library(
-    name = "auth",
+    name = "go_default_library",
     embed = [":auth_go_proto"],
-    importpath = "github.com/lucperkins/colossus/proto/auth",
+    importpath = "github.com/cwbriones/colossus/proto/auth",
     visibility = ["//visibility:public"],
 )

@@ -41,8 +41,8 @@ cc_image(
 
 container_push(
     name = "auth-push",
-    image = ":colossus-auth",
     format = "Docker",
+    image = ":colossus-auth",
     registry = DOCKER_REGISTRY_URL,
     repository = "colossus/auth",
     tag = "{BUILD_TIMESTAMP}",
@@ -50,8 +50,8 @@ container_push(
 
 container_push(
     name = "web-push",
-    image = ":colossus-web",
     format = "Docker",
+    image = ":colossus-web",
     registry = DOCKER_REGISTRY_URL,
     repository = "colossus/web",
     tag = "{BUILD_TIMESTAMP}",
@@ -59,8 +59,8 @@ container_push(
 
 container_push(
     name = "data-push",
-    image = ":colossus-data",
     format = "Docker",
+    image = ":colossus-data",
     registry = DOCKER_REGISTRY_URL,
     repository = "colossus/data",
     tag = "{BUILD_TIMESTAMP}",
@@ -68,8 +68,8 @@ container_push(
 
 container_push(
     name = "userinfo-push",
-    image = ":colossus-userinfo",
     format = "Docker",
+    image = ":colossus-userinfo",
     registry = DOCKER_REGISTRY_URL,
     repository = "colossus/userinfo",
     tag = "{BUILD_TIMESTAMP}",

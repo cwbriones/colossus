@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 
-	"github.com/lucperkins/colossus/proto/auth"
+	"github.com/cwbriones/colossus/proto/auth"
 )
 
 const (
